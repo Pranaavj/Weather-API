@@ -1,0 +1,121 @@
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Scanner;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class WeatherApi {
+
+    private static final String API_KEY = "d0f2ffc2a9894baa95349e716b77c2e4";
+    private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s";
+
+    public static void main(String[] args) throws IOException {
+
+        // Set the location for which you want to get the weather data
+        String location = "New York";
+
+        // Create the URL for the API request
+        URL url = new URL(String.format(BASE_URL, location, API_KEY));
+
+        // Send the API request and get the response
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        InputStream responseStream = connection.getInputStream();
+
+        // Read the response and convert it to a string
+        Scanner scanner = new Scanner(responseStream);
+        StringBuilder responseBuilder = new StringBuilder();
+        while (scanner.hasNextLine()) {
+            responseBuilder.append(scanner.nextLine());
+        }
+        String response = responseBuilder.toString();
+
+        // Parse the JSON response using Jackson library
+        ObjectMapper = new ObjectMapper();
+        WeatherResponse weatherResponse = objectMapper.readValue(response, WeatherResponse.class);
+
+        // Print the weather data to the console
+        System.out.println("Current weather in " + weatherResponse.getName() + ":");
+        System.out.println("Temperature: " + weatherResponse.getMain().getTemp() + " °C");
+        System.out.println("Feels like: " + weatherResponse.getMain().getFeelsLike() + " °C");
+        System.out.println("Humidity: " + weatherResponse.getMain().getHumidity() + "%");
+        System.out.println("Description: " + weatherResponse.getWeather().get(0).getDescription());
+    }
+}
+
+class WeatherResponse {
+
+    private Main main;
+    private java.util.List<Weather> weather;
+    private String name;
+
+    public Main getMain() {
+        return main;
+    }
+
+    public void setMain(Main main) {
+        this.main = main;
+    }
+
+    public java.util.List<Weather> getWeather() {
+        return weather;
+    }
+
+    public void setWeather(java.util.List<Weather> weather) {
+        this.weather = weather;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+class Main {
+
+    private double temp;
+    private double feels_like;
+    private int humidity;
+
+    public double getTemp() {
+        return temp;
+    }
+
+    public void setTemp(double temp) {
+        this.temp = temp;
+    }
+
+    public double getFeelsLike() {
+        return feels_like;
+    }
+
+    public void setFeelsLike(double feels_like) {
+        this.feels_like = feels_like;
+    }
+
+    public int getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(int humidity) {
+        this.humidity = humidity;
+    }
+}
+
+class Weather {
+
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
